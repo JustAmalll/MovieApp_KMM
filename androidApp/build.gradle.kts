@@ -60,8 +60,8 @@ dependencies {
     // Accompanist System UI Controller
     implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.0-alpha")
 
-    // Material Design
-    implementation("androidx.compose.material:material:1.4.0")
+    // Material 3
+    implementation("androidx.compose.material3:material3:1.1.0-beta02")
 
     // Dagger Hilt
     val hiltVersion = "2.45"
