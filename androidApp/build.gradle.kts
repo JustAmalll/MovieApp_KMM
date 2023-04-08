@@ -3,6 +3,9 @@
 plugins {
     id("com.android.application")
     kotlin("android")
+    kotlin("kapt")
+    id("org.jetbrains.kotlin.plugin.serialization")
+    id("com.google.dagger.hilt.android")
 }
 
 android {
@@ -43,14 +46,28 @@ android {
 dependencies {
     implementation(project(":shared"))
 
-    // Jetpack compose
+    // Jetpack Compose
     implementation(platform("androidx.compose:compose-bom:2023.03.00"))
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui")
     implementation("androidx.compose.ui:ui-tooling-preview")
     implementation("androidx.compose.material:material-icons-extended")
-    implementation ("androidx.activity:activity-compose:1.7.0")
+    implementation("androidx.activity:activity-compose:1.7.0")
+
+    // Jetpack Compose Navigation
+    implementation("androidx.navigation:navigation-compose:2.5.3")
+
+    // Accompanist System UI Controller
+    implementation("com.google.accompanist:accompanist-systemuicontroller:0.31.0-alpha")
 
     // Material Design
     implementation("androidx.compose.material:material:1.4.0")
+
+    // Dagger Hilt
+    val hiltVersion = "2.45"
+    val hiltCompilerVersion = "1.0.0"
+    implementation("com.google.dagger:hilt-android:$hiltVersion")
+    kapt("com.google.dagger:hilt-android-compiler:$hiltVersion")
+    kapt("androidx.hilt:hilt-compiler:$hiltCompilerVersion")
+    implementation("androidx.hilt:hilt-navigation-compose:$hiltCompilerVersion")
 }
