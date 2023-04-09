@@ -75,7 +75,11 @@ fun MovieItem(
                         contentDescription = "Star"
                     )
                     Spacer(modifier = Modifier.width(4.dp))
-                    Text(text = "7.7", fontSize = 16.sp, fontWeight = FontWeight.Bold)
+                    Text(
+                        text = movie.vote_average.toString(),
+                        fontSize = 16.sp,
+                        fontWeight = FontWeight.Bold
+                    )
                 }
             }
             IconButton(onClick = {}) {

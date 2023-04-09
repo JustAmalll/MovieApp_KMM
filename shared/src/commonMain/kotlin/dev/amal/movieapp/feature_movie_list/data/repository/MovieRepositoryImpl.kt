@@ -11,11 +11,11 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 
+// TODO handle network errors
 class MovieRepositoryImpl(
     private val client: HttpClient,
 ) : MovieRepository {
 
-    // TODO handle network errors
     override suspend fun getPopularMovies(page: Int): Resource<List<Movie>> {
         val result = client.get("$BASE_URL/movie/popular") {
             parameter("api_key", API_KEY)
@@ -27,7 +27,6 @@ class MovieRepositoryImpl(
         return Resource.Success(popularMovies)
     }
 
-    // TODO handle network errors
     override suspend fun getGenreMovieList(): Resource<List<Genre>> {
         val result = client.get("$BASE_URL/genre/movie/list") {
             parameter("api_key", API_KEY)
@@ -36,5 +35,16 @@ class MovieRepositoryImpl(
         val response = result.body<GenreListDto>()
         val genres = response.genres.map { it.toGenre() }
         return Resource.Success(genres)
+    }
+
+    override suspend fun searchMovie(query: String): Resource<List<Movie>> {
+        val result = client.get("$BASE_URL/search/movie") {
+            parameter("api_key", API_KEY)
+            parameter("query", query)
+        }
+
+        val response = result.body<MovieDto>()
+        val searchedMovie = response.results.map { it.toMovie() }
+        return Resource.Success(searchedMovie)
     }
 }

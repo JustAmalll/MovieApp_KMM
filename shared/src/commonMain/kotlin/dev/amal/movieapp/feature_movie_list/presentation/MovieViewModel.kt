@@ -12,7 +12,7 @@ import kotlinx.coroutines.launch
 
 class MovieViewModel(
     private val movieRepository: MovieRepository,
-    coroutineScope: CoroutineScope?
+    coroutineScope: CoroutineScope? = null
 ) {
     private val viewModelScope = coroutineScope ?: CoroutineScope(Dispatchers.Main)
 
@@ -47,7 +47,20 @@ class MovieViewModel(
         getGenreMovieList()
     }
 
-    fun loadNextItems() {
+    fun onEvent(event: MovieUIEvent) {
+        when (event) {
+            MovieUIEvent.LoadNextItems -> loadNextItems()
+            is MovieUIEvent.OnSearchTextChanged -> _state.update {
+                it.copy(searchText = event.value)
+            }
+            MovieUIEvent.OnSearchClicked -> searchMovie()
+            MovieUIEvent.OnSearchCloseClicked -> _state.update {
+                it.copy(searchedMovies = emptyList())
+            }
+        }
+    }
+
+    private fun loadNextItems() {
         viewModelScope.launch {
             paginator.loadNextItems()
         }
@@ -69,5 +82,18 @@ class MovieViewModel(
     fun getGenreById(genresId: List<Int>): String {
         val filtered = state.value.genres.filter { it.id in genresId }
         return filtered.joinToString { it.name }
+    }
+
+    private fun searchMovie() {
+        viewModelScope.launch {
+            when (val result = movieRepository.searchMovie(query = state.value.searchText)) {
+                is Resource.Success -> _state.update {
+                    it.copy(searchedMovies = result.data ?: emptyList())
+                }
+                is Resource.Error -> _state.update {
+                    it.copy(error = result.message ?: "An unknown error occurred")
+                }
+            }
+        }
     }
 }

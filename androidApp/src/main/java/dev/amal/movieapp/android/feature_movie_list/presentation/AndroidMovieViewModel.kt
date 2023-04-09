@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import dagger.hilt.android.lifecycle.HiltViewModel
 import dev.amal.movieapp.feature_movie_list.domain.repository.MovieRepository
+import dev.amal.movieapp.feature_movie_list.presentation.MovieUIEvent
 import dev.amal.movieapp.feature_movie_list.presentation.MovieViewModel
 import javax.inject.Inject
 
@@ -21,11 +22,11 @@ class AndroidMovieViewModel @Inject constructor(
 
     val state = viewModel.state
 
-    fun getGenreById(genresId: List<Int>): String {
-        return viewModel.getGenreById(genresId)
+    fun onEvent(event: MovieUIEvent) {
+        viewModel.onEvent(event)
     }
 
-    fun loadNextItems() {
-        viewModel.loadNextItems()
+    fun getGenreById(genresId: List<Int>): String {
+        return viewModel.getGenreById(genresId)
     }
 }

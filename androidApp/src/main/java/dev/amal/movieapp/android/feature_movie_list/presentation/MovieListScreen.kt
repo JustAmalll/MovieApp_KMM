@@ -1,5 +1,6 @@
 package dev.amal.movieapp.android.feature_movie_list.presentation
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
@@ -7,24 +8,31 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.SideEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.MovieItem
+import dev.amal.movieapp.android.feature_movie_list.presentation.components.SearchAppBar
+import dev.amal.movieapp.feature_movie_list.presentation.MovieState
+import dev.amal.movieapp.feature_movie_list.presentation.MovieUIEvent
+import dev.amal.movieapp.feature_movie_list.presentation.MovieUIEvent.*
 
-@OptIn(ExperimentalMaterial3Api::class)
+@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
 @Composable
 fun MovieListScreen(
-    viewModel: AndroidMovieViewModel = hiltViewModel(),
+    state: MovieState,
+    onEvent: (MovieUIEvent) -> Unit,
+    getGenreById: (List<Int>) -> String
 ) {
-    val state by viewModel.state.collectAsStateWithLifecycle()
+    var showSearchingTopBar by remember { mutableStateOf(false) }
+
+    val keyBoardController = LocalSoftwareKeyboardController.current
 
     val systemUiController = rememberSystemUiController()
     val darkTheme = isSystemInDarkTheme()
@@ -42,23 +50,37 @@ fun MovieListScreen(
 
     Scaffold(
         topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Popular Movies",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 26.sp
-                    )
-                },
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search"
-                        )
+            AnimatedContent(targetState = showSearchingTopBar) { shouldShowSearchingTopBar ->
+                if (shouldShowSearchingTopBar) SearchAppBar(
+                    text = state.searchText,
+                    onValueChange = { onEvent(OnSearchTextChanged(it)) },
+                    onCloseClicked = {
+                        showSearchingTopBar = false
+                        onEvent(OnSearchCloseClicked)
+                    },
+                    onSearchClicked = {
+                        onEvent(OnSearchClicked)
+                        keyBoardController?.hide()
                     }
-                }
-            )
+                )
+                else TopAppBar(
+                    title = {
+                        Text(
+                            text = "Popular Movies",
+                            fontWeight = FontWeight.Bold,
+                            fontSize = 26.sp
+                        )
+                    },
+                    actions = {
+                        IconButton(onClick = { showSearchingTopBar = true }) {
+                            Icon(
+                                imageVector = Icons.Default.Search,
+                                contentDescription = "Search"
+                            )
+                        }
+                    }
+                )
+            }
         }
     ) { paddingValues ->
         LazyColumn(
@@ -67,15 +89,17 @@ fun MovieListScreen(
                 .padding(paddingValues),
             contentPadding = PaddingValues(vertical = 18.dp)
         ) {
-            itemsIndexed(state.popularMovies) { index, movie ->
-                if (index >= state.popularMovies.size - 1 && !state.endReached && !state.isLoading) {
-                    viewModel.loadNextItems()
+            val listToShow = state.searchedMovies.ifEmpty { state.popularMovies }
+
+            itemsIndexed(listToShow) { index, movie ->
+                if (index >= listToShow.size - 1 && !state.endReached && !state.isLoading) {
+                    onEvent(LoadNextItems)
                 }
                 MovieItem(
                     movie = movie,
-                    getGenreById = { viewModel.getGenreById(movie.genre_ids) }
+                    getGenreById = { getGenreById(movie.genre_ids) }
                 )
-                if (index < state.popularMovies.lastIndex) {
+                if (index < listToShow.lastIndex) {
                     Divider(modifier = Modifier.padding(vertical = 24.dp))
                 }
             }
@@ -91,4 +115,14 @@ fun MovieListScreen(
             }
         }
     }
+}
+
+@Preview
+@Composable
+fun MovieListScreenPreview() {
+    MovieListScreen(
+        state = MovieState(),
+        onEvent = {},
+        getGenreById = { "" }
+    )
 }
