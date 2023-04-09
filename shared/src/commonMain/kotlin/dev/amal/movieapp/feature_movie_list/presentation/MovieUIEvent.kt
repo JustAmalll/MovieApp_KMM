@@ -4,5 +4,7 @@ sealed interface MovieUIEvent {
     data class OnSearchTextChanged(val value: String): MovieUIEvent
     object OnSearchClicked: MovieUIEvent
     object OnSearchCloseClicked: MovieUIEvent
-    object LoadNextItems: MovieUIEvent
+    object LoadNextMovies: MovieUIEvent
+    object LoadNextSearchedMovies: MovieUIEvent
+    object OnErrorSeen: MovieUIEvent
 }

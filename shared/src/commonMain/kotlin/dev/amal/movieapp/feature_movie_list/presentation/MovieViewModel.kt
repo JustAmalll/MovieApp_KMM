@@ -19,8 +19,8 @@ class MovieViewModel(
     private val _state = MutableStateFlow(MovieState())
     val state = _state.toCommonStateFlow()
 
-    private val paginator = DefaultPaginator(
-        initialKey = state.value.page,
+    private val moviePaginator = DefaultPaginator(
+        initialKey = state.value.moviePage,
         onLoadUpdated = { isLoading ->
             _state.update { it.copy(isLoading = isLoading) }
         },
@@ -28,7 +28,7 @@ class MovieViewModel(
             movieRepository.getPopularMovies(page = nextPage)
         },
         getNextKey = {
-            state.value.page + 1
+            state.value.moviePage + 1
         },
         onError = { message ->
             _state.update { it.copy(error = message) }
@@ -36,33 +36,64 @@ class MovieViewModel(
         onSuccess = { items, newKey ->
             _state.value = state.value.copy(
                 popularMovies = state.value.popularMovies + items,
-                page = newKey,
+                moviePage = newKey,
+                endReached = items.isEmpty()
+            )
+        }
+    )
+
+    private val searchPaginator = DefaultPaginator(
+        initialKey = state.value.searchPage,
+        onLoadUpdated = { isLoading ->
+            _state.update { it.copy(isLoading = isLoading) }
+        },
+        onRequest = { nextPage ->
+            movieRepository.searchMovie(query = state.value.searchText, page = nextPage)
+        },
+        getNextKey = {
+            state.value.searchPage + 1
+        },
+        onError = { message ->
+            _state.update { it.copy(error = message) }
+        },
+        onSuccess = { items, newKey ->
+            _state.value = state.value.copy(
+                searchedMovies = state.value.searchedMovies + items,
+                searchPage = newKey,
                 endReached = items.isEmpty()
             )
         }
     )
 
     init {
-        loadNextItems()
+        loadNextMovies()
         getGenreMovieList()
     }
 
     fun onEvent(event: MovieUIEvent) {
         when (event) {
-            MovieUIEvent.LoadNextItems -> loadNextItems()
+            MovieUIEvent.LoadNextMovies -> loadNextMovies()
             is MovieUIEvent.OnSearchTextChanged -> _state.update {
                 it.copy(searchText = event.value)
             }
-            MovieUIEvent.OnSearchClicked -> searchMovie()
+            MovieUIEvent.OnSearchClicked -> loadNextSearchedMovies()
+            MovieUIEvent.LoadNextSearchedMovies -> loadNextSearchedMovies()
             MovieUIEvent.OnSearchCloseClicked -> _state.update {
                 it.copy(searchedMovies = emptyList())
             }
+            MovieUIEvent.OnErrorSeen -> _state.update { it.copy(error = null) }
         }
     }
 
-    private fun loadNextItems() {
+    private fun loadNextMovies() {
         viewModelScope.launch {
-            paginator.loadNextItems()
+            moviePaginator.loadNextItems()
+        }
+    }
+
+    private fun loadNextSearchedMovies() {
+        viewModelScope.launch {
+            searchPaginator.loadNextItems()
         }
     }
 
@@ -82,18 +113,5 @@ class MovieViewModel(
     fun getGenreById(genresId: List<Int>): String {
         val filtered = state.value.genres.filter { it.id in genresId }
         return filtered.joinToString { it.name }
-    }
-
-    private fun searchMovie() {
-        viewModelScope.launch {
-            when (val result = movieRepository.searchMovie(query = state.value.searchText)) {
-                is Resource.Success -> _state.update {
-                    it.copy(searchedMovies = result.data ?: emptyList())
-                }
-                is Resource.Error -> _state.update {
-                    it.copy(error = result.message ?: "An unknown error occurred")
-                }
-            }
-        }
     }
 }

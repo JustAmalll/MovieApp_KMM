@@ -9,9 +9,8 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
-import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalSoftwareKeyboardController
+import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
@@ -23,7 +22,7 @@ import dev.amal.movieapp.feature_movie_list.presentation.MovieState
 import dev.amal.movieapp.feature_movie_list.presentation.MovieUIEvent
 import dev.amal.movieapp.feature_movie_list.presentation.MovieUIEvent.*
 
-@OptIn(ExperimentalMaterial3Api::class, ExperimentalComposeUiApi::class)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieListScreen(
     state: MovieState,
@@ -32,7 +31,8 @@ fun MovieListScreen(
 ) {
     var showSearchingTopBar by remember { mutableStateOf(false) }
 
-    val keyBoardController = LocalSoftwareKeyboardController.current
+    val snackBarHostState = remember { SnackbarHostState() }
+    val focusManager = LocalFocusManager.current
 
     val systemUiController = rememberSystemUiController()
     val darkTheme = isSystemInDarkTheme()
@@ -48,7 +48,15 @@ fun MovieListScreen(
         )
     }
 
+    LaunchedEffect(key1 = state.error) {
+        state.error?.let { error ->
+            snackBarHostState.showSnackbar(message = error)
+            onEvent(OnErrorSeen)
+        }
+    }
+
     Scaffold(
+        snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
             AnimatedContent(targetState = showSearchingTopBar) { shouldShowSearchingTopBar ->
                 if (shouldShowSearchingTopBar) SearchAppBar(
@@ -60,7 +68,7 @@ fun MovieListScreen(
                     },
                     onSearchClicked = {
                         onEvent(OnSearchClicked)
-                        keyBoardController?.hide()
+                        focusManager.clearFocus()
                     }
                 )
                 else TopAppBar(
@@ -89,11 +97,13 @@ fun MovieListScreen(
                 .padding(paddingValues),
             contentPadding = PaddingValues(vertical = 18.dp)
         ) {
+            // TODO Code Refactor
             val listToShow = state.searchedMovies.ifEmpty { state.popularMovies }
 
             itemsIndexed(listToShow) { index, movie ->
                 if (index >= listToShow.size - 1 && !state.endReached && !state.isLoading) {
-                    onEvent(LoadNextItems)
+                    if (showSearchingTopBar) onEvent(LoadNextSearchedMovies)
+                    else onEvent(LoadNextMovies)
                 }
                 MovieItem(
                     movie = movie,

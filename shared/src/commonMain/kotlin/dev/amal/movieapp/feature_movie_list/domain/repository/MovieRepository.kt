@@ -7,5 +7,5 @@ import dev.amal.movieapp.feature_movie_list.domain.model.Movie
 interface MovieRepository {
     suspend fun getPopularMovies(page: Int): Resource<List<Movie>>
     suspend fun getGenreMovieList(): Resource<List<Genre>>
-    suspend fun searchMovie(query: String): Resource<List<Movie>>
+    suspend fun searchMovie(page: Int, query: String): Resource<List<Movie>>
 }

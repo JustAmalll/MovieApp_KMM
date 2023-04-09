@@ -12,9 +12,8 @@ import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
 
-// TODO handle network errors
 class MovieRepositoryImpl(
-    private val client: HttpClient,
+    private val client: HttpClient
 ) : MovieRepository {
 
     override suspend fun getPopularMovies(page: Int): Resource<List<Movie>> {
@@ -35,9 +34,10 @@ class MovieRepositoryImpl(
         return Resource.Success(genres)
     }
 
-    override suspend fun searchMovie(query: String): Resource<List<Movie>> {
+    override suspend fun searchMovie(page: Int, query: String): Resource<List<Movie>> {
         val result = client.get("search/movie") {
             parameter("query", query)
+            parameter("page", page)
         }
 
         val response = result.body<MovieDto>()
