@@ -16,11 +16,10 @@ class MovieRepositoryImpl(
 ) : MovieRepository {
 
     // TODO handle network errors
-    override suspend fun getPopularMovies(): Resource<List<Movie>> {
-        println("fun getPopularMovies()")
-
+    override suspend fun getPopularMovies(page: Int): Resource<List<Movie>> {
         val result = client.get("$BASE_URL/movie/popular") {
             parameter("api_key", API_KEY)
+            parameter("page", page)
         }
 
         val response = result.body<MovieDto>()
@@ -30,9 +29,6 @@ class MovieRepositoryImpl(
 
     // TODO handle network errors
     override suspend fun getGenreMovieList(): Resource<List<Genre>> {
-
-        println("fun getGenreMovieList()")
-
         val result = client.get("$BASE_URL/genre/movie/list") {
             parameter("api_key", API_KEY)
         }

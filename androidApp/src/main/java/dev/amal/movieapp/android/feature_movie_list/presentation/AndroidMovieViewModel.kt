@@ -9,7 +9,7 @@ import javax.inject.Inject
 
 @HiltViewModel
 class AndroidMovieViewModel @Inject constructor(
-    private val movieRepository: MovieRepository,
+    private val movieRepository: MovieRepository
 ) : ViewModel() {
 
     private val viewModel by lazy {
@@ -23,5 +23,9 @@ class AndroidMovieViewModel @Inject constructor(
 
     fun getGenreById(genresId: List<Int>): String {
         return viewModel.getGenreById(genresId)
+    }
+
+    fun loadNextItems() {
+        viewModel.loadNextItems()
     }
 }

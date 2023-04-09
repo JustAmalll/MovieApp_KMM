@@ -69,6 +69,9 @@ dependencies {
     // Coil
     implementation("io.coil-kt:coil-compose:2.2.0")
 
+    // Paging 3.0
+    implementation("androidx.paging:paging-compose:1.0.0-alpha18")
+
     // Dagger Hilt
     val hiltVersion = "2.45"
     val hiltCompilerVersion = "1.0.0"

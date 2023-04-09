@@ -1,9 +1,7 @@
 package dev.amal.movieapp.android.feature_movie_list.presentation
 
 import androidx.compose.foundation.isSystemInDarkTheme
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
@@ -42,19 +40,27 @@ fun MovieListScreen(
         )
     }
 
-    Scaffold(topBar = {
-        TopAppBar(title = {
-            Text(
-                text = "Popular Movies", fontWeight = FontWeight.Bold, fontSize = 26.sp
+    Scaffold(
+        topBar = {
+            TopAppBar(
+                title = {
+                    Text(
+                        text = "Popular Movies",
+                        fontWeight = FontWeight.Bold,
+                        fontSize = 26.sp
+                    )
+                },
+                actions = {
+                    IconButton(onClick = {}) {
+                        Icon(
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search"
+                        )
+                    }
+                }
             )
-        }, actions = {
-            IconButton(onClick = {}) {
-                Icon(
-                    imageVector = Icons.Default.Search, contentDescription = "Search"
-                )
-            }
-        })
-    }) { paddingValues ->
+        }
+    ) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -62,13 +68,25 @@ fun MovieListScreen(
             contentPadding = PaddingValues(vertical = 18.dp)
         ) {
             itemsIndexed(state.popularMovies) { index, movie ->
+                if (index >= state.popularMovies.size - 1 && !state.endReached && !state.isLoading) {
+                    viewModel.loadNextItems()
+                }
                 MovieItem(
                     movie = movie,
                     getGenreById = { viewModel.getGenreById(movie.genre_ids) }
                 )
-
                 if (index < state.popularMovies.lastIndex) {
                     Divider(modifier = Modifier.padding(vertical = 24.dp))
+                }
+            }
+            item {
+                if (state.isLoading) Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(8.dp),
+                    horizontalArrangement = Arrangement.Center
+                ) {
+                    CircularProgressIndicator()
                 }
             }
         }
