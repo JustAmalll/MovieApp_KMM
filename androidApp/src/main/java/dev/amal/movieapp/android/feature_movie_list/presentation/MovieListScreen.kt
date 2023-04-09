@@ -5,7 +5,7 @@ import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -55,7 +55,8 @@ fun MovieListScreen(
                 actions = {
                     IconButton(onClick = {}) {
                         Icon(
-                            imageVector = Icons.Default.Search, contentDescription = "Search"
+                            imageVector = Icons.Default.Search,
+                            contentDescription = "Search"
                         )
                     }
                 }
@@ -66,10 +67,14 @@ fun MovieListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
-            contentPadding = PaddingValues(top = 18.dp)
+            contentPadding = PaddingValues(vertical = 18.dp)
         ) {
-            items(state.popularMovies) { movie ->
+            itemsIndexed(state.popularMovies) { index, movie ->
                 MovieItem(movie = movie)
+
+                if (index < state.popularMovies.lastIndex) {
+                    Divider(modifier = Modifier.padding(vertical = 24.dp))
+                }
             }
         }
     }

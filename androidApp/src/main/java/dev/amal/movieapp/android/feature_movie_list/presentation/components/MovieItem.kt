@@ -4,6 +4,7 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -19,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import dev.amal.movieapp.android.R
+import dev.amal.movieapp.core.utils.Constants.IMAGES_URL
 import dev.amal.movieapp.feature_movie_list.domain.model.Movie
 
 @Composable
@@ -28,14 +30,22 @@ fun MovieItem(movie: Movie) {
             .fillMaxWidth()
             .padding(horizontal = 12.dp)
     ) {
-        AsyncImage(
-            modifier = Modifier
-                .fillMaxWidth()
-                .clip(RoundedCornerShape(12.dp)),
-            model = "https://image.tmdb.org/t/p/w500" + movie.backdrop_path,
-            contentDescription = null,
-            contentScale = ContentScale.FillWidth
-        )
+        Card(modifier = Modifier.height(200.dp)) {
+            Box(contentAlignment = Alignment.Center) {
+                AsyncImage(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .clip(RoundedCornerShape(12.dp)),
+                    model = IMAGES_URL + movie.backdrop_path,
+                    contentDescription = null,
+                    contentScale = ContentScale.FillWidth
+                )
+                if (movie.backdrop_path == null) Icon(
+                    imageVector = Icons.Default.Error,
+                    contentDescription = "Error"
+                )
+            }
+        }
         Row(
             modifier = Modifier
                 .fillMaxWidth()
@@ -74,6 +84,5 @@ fun MovieItem(movie: Movie) {
             }
         }
     }
-    Divider(modifier = Modifier.padding(vertical = 24.dp))
 }
 
