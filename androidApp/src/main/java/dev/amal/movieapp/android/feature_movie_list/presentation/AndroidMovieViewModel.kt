@@ -20,4 +20,8 @@ class AndroidMovieViewModel @Inject constructor(
     }
 
     val state = viewModel.state
+
+    fun getGenreById(genresId: List<Int>): String {
+        return viewModel.getGenreById(genresId)
+    }
 }

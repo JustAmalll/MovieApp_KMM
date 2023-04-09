@@ -24,7 +24,10 @@ import dev.amal.movieapp.core.utils.Constants.IMAGES_URL
 import dev.amal.movieapp.feature_movie_list.domain.model.Movie
 
 @Composable
-fun MovieItem(movie: Movie) {
+fun MovieItem(
+    movie: Movie,
+    getGenreById: () -> String
+) {
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -49,21 +52,20 @@ fun MovieItem(movie: Movie) {
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(top = 24.dp),
-            horizontalArrangement = Arrangement.SpaceBetween
+                .padding(top = 24.dp)
         ) {
-            Column {
+            Column(modifier = Modifier.weight(1f)) {
                 Text(
                     text = movie.title,
                     fontWeight = FontWeight.Medium,
                     fontSize = 18.sp
                 )
                 Text(
-                    text = "Science Fiction, Adventure, Action",
+                    text = getGenreById(),
                     modifier = Modifier.alpha(0.6f),
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 2,
-                    overflow = TextOverflow.Ellipsis,
+                    overflow = TextOverflow.Ellipsis
                 )
                 Spacer(modifier = Modifier.height(8.dp))
                 Row(verticalAlignment = Alignment.CenterVertically) {

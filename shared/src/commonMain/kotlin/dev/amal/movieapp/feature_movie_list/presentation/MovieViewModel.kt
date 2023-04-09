@@ -20,6 +20,7 @@ class MovieViewModel(
 
     init {
         getPopularMovies()
+        getGenreMovieList()
     }
 
     private fun getPopularMovies() {
@@ -33,5 +34,23 @@ class MovieViewModel(
                 }
             }
         }
+    }
+
+    private fun getGenreMovieList() {
+        viewModelScope.launch {
+            when (val result = movieRepository.getGenreMovieList()) {
+                is Resource.Success -> _state.update {
+                    it.copy(genres = result.data ?: emptyList())
+                }
+                is Resource.Error -> _state.update {
+                    it.copy(error = result.message ?: "An unknown error occurred")
+                }
+            }
+        }
+    }
+
+    fun getGenreById(genresId: List<Int>): String {
+        val filtered = state.value.genres.filter { it.id in genresId }
+        return filtered.joinToString { it.name }
     }
 }

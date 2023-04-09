@@ -3,8 +3,8 @@ package dev.amal.movieapp.feature_movie_list.data.repository
 import dev.amal.movieapp.core.utils.Constants.API_KEY
 import dev.amal.movieapp.core.utils.Constants.BASE_URL
 import dev.amal.movieapp.core.utils.Resource
-import dev.amal.movieapp.feature_movie_list.data.remote.dto.MovieDto
-import dev.amal.movieapp.feature_movie_list.data.remote.dto.toMovie
+import dev.amal.movieapp.feature_movie_list.data.remote.dto.*
+import dev.amal.movieapp.feature_movie_list.domain.model.Genre
 import dev.amal.movieapp.feature_movie_list.domain.model.Movie
 import dev.amal.movieapp.feature_movie_list.domain.repository.MovieRepository
 import io.ktor.client.*
@@ -17,6 +17,8 @@ class MovieRepositoryImpl(
 
     // TODO handle network errors
     override suspend fun getPopularMovies(): Resource<List<Movie>> {
+        println("fun getPopularMovies()")
+
         val result = client.get("$BASE_URL/movie/popular") {
             parameter("api_key", API_KEY)
         }
@@ -26,4 +28,17 @@ class MovieRepositoryImpl(
         return Resource.Success(popularMovies)
     }
 
+    // TODO handle network errors
+    override suspend fun getGenreMovieList(): Resource<List<Genre>> {
+
+        println("fun getGenreMovieList()")
+
+        val result = client.get("$BASE_URL/genre/movie/list") {
+            parameter("api_key", API_KEY)
+        }
+
+        val response = result.body<GenreListDto>()
+        val genres = response.genres.map { it.toGenre() }
+        return Resource.Success(genres)
+    }
 }

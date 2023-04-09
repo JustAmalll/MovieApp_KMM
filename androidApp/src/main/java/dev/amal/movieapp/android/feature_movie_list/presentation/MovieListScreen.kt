@@ -42,27 +42,19 @@ fun MovieListScreen(
         )
     }
 
-    Scaffold(
-        topBar = {
-            TopAppBar(
-                title = {
-                    Text(
-                        text = "Popular Movies",
-                        fontWeight = FontWeight.Bold,
-                        fontSize = 26.sp
-                    )
-                },
-                actions = {
-                    IconButton(onClick = {}) {
-                        Icon(
-                            imageVector = Icons.Default.Search,
-                            contentDescription = "Search"
-                        )
-                    }
-                }
+    Scaffold(topBar = {
+        TopAppBar(title = {
+            Text(
+                text = "Popular Movies", fontWeight = FontWeight.Bold, fontSize = 26.sp
             )
-        }
-    ) { paddingValues ->
+        }, actions = {
+            IconButton(onClick = {}) {
+                Icon(
+                    imageVector = Icons.Default.Search, contentDescription = "Search"
+                )
+            }
+        })
+    }) { paddingValues ->
         LazyColumn(
             modifier = Modifier
                 .fillMaxSize()
@@ -70,7 +62,10 @@ fun MovieListScreen(
             contentPadding = PaddingValues(vertical = 18.dp)
         ) {
             itemsIndexed(state.popularMovies) { index, movie ->
-                MovieItem(movie = movie)
+                MovieItem(
+                    movie = movie,
+                    getGenreById = { viewModel.getGenreById(movie.genre_ids) }
+                )
 
                 if (index < state.popularMovies.lastIndex) {
                     Divider(modifier = Modifier.padding(vertical = 24.dp))
