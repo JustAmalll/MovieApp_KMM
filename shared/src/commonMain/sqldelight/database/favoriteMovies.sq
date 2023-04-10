@@ -2,7 +2,6 @@ CREATE TABLE favoriteMoviesEntity(
     id INTEGER NOT NULL,
     backdrop_path TEXT,
     genres TEXT NOT NULL,
-    release_date TEXT,
     title TEXT NOT NULL,
     vote_average REAL NOT NULL
 );
@@ -17,11 +16,10 @@ INTO favoriteMoviesEntity(
     id,
     backdrop_path,
     genres,
-    release_date,
     title,
     vote_average
 )
-VALUES ( ?,?, ?, ?, ?, ?);
+VALUES ( ?,?, ?, ?, ?);
 
 removeFromFavorites:
 DELETE FROM favoriteMoviesEntity

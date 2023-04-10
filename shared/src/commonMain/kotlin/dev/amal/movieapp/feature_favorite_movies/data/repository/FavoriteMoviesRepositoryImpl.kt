@@ -30,7 +30,6 @@ class FavoriteMoviesRepositoryImpl(
             id = movie.id,
             backdrop_path = movie.backdrop_path,
             genres = movie.genres,
-            release_date = movie.release_date,
             title = movie.title,
             vote_average = movie.vote_average
         )

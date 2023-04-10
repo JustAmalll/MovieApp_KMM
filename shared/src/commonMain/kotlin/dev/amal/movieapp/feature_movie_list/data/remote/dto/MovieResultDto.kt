@@ -24,7 +24,6 @@ fun MovieResultDto.toMovie(): Movie = Movie(
     id = id,
     backdrop_path = backdrop_path,
     genre_ids = genre_ids,
-    release_date = release_date,
     title = title,
     vote_average = vote_average
 )

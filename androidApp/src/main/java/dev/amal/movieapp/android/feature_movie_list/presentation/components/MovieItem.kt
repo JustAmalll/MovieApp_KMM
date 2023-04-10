@@ -1,5 +1,6 @@
 package dev.amal.movieapp.android.feature_movie_list.presentation.components
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -8,7 +9,7 @@ import androidx.compose.material.icons.filled.Error
 import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -31,6 +32,8 @@ fun MovieItem(
     onAddToFavorites: () -> Unit = {},
     onRemoveFromFavorites: () -> Unit
 ) {
+    var isImageLoading by remember { mutableStateOf(true) }
+
     Column(
         modifier = Modifier
             .fillMaxWidth()
@@ -38,17 +41,21 @@ fun MovieItem(
     ) {
         Card(modifier = Modifier.height(200.dp)) {
             Box(contentAlignment = Alignment.Center) {
+                if (isImageLoading) CircularProgressIndicator()
+                else if (movie.backdrop_path == null) Icon(
+                    imageVector = Icons.Default.Error,
+                    contentDescription = "Error"
+                )
                 AsyncImage(
                     modifier = Modifier
                         .fillMaxWidth()
                         .clip(RoundedCornerShape(12.dp)),
                     model = IMAGES_URL + movie.backdrop_path,
                     contentDescription = null,
-                    contentScale = ContentScale.FillWidth
-                )
-                if (movie.backdrop_path == null) Icon(
-                    imageVector = Icons.Default.Error,
-                    contentDescription = "Error"
+                    contentScale = ContentScale.FillWidth,
+                    onLoading = { isImageLoading = true },
+                    onSuccess = { isImageLoading = false },
+                    onError = { isImageLoading = false },
                 )
             }
         }
@@ -85,18 +92,20 @@ fun MovieItem(
                     )
                 }
             }
-            if (movie.isFavoriteMovie) IconButton(onClick = onRemoveFromFavorites) {
-                Icon(
-                    imageVector = Icons.Default.Favorite,
-                    contentDescription = "Favorite",
-                    tint = Color.Red
-                )
-            }
-            else IconButton(onClick = onAddToFavorites) {
-                Icon(
-                    imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = "FavoriteBorder"
-                )
+            AnimatedContent(targetState = movie.isFavoriteMovie) { isFavoriteMovie ->
+                if (isFavoriteMovie) IconButton(onClick = onRemoveFromFavorites) {
+                    Icon(
+                        imageVector = Icons.Default.Favorite,
+                        contentDescription = "Favorite",
+                        tint = Color.Red
+                    )
+                }
+                else IconButton(onClick = onAddToFavorites) {
+                    Icon(
+                        imageVector = Icons.Default.FavoriteBorder,
+                        contentDescription = "FavoriteBorder"
+                    )
+                }
             }
         }
     }

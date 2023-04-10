@@ -5,6 +5,9 @@
 
     <application
         android:name=".MovieApp"
+        android:icon="@mipmap/ic_launcher"
+        android:label="MovieApp"
+        android:roundIcon="@mipmap/ic_launcher_round"
         android:allowBackup="false"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">

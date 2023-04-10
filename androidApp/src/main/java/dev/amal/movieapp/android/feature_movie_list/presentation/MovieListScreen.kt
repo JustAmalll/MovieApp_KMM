@@ -68,7 +68,6 @@ fun MovieListScreen(
                     id = movie.id,
                     backdrop_path = movie.backdrop_path,
                     genres = getGenreById(movie.genre_ids),
-                    release_date = movie.release_date,
                     title = movie.title,
                     vote_average = movie.vote_average,
                     isFavoriteMovie = state.favoriteMovieIds.any { favoriteMovieId ->
@@ -86,7 +85,6 @@ fun MovieListScreen(
                     id = movie.id,
                     backdrop_path = movie.backdrop_path,
                     genres = getGenreById(movie.genre_ids),
-                    release_date = movie.release_date,
                     title = movie.title,
                     vote_average = movie.vote_average,
                     isFavoriteMovie = state.favoriteMovieIds.any { favoriteMovieId ->
