@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Error
+import androidx.compose.material.icons.filled.Favorite
 import androidx.compose.material.icons.filled.FavoriteBorder
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
@@ -12,6 +13,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
@@ -21,12 +23,13 @@ import androidx.compose.ui.unit.sp
 import coil.compose.AsyncImage
 import dev.amal.movieapp.android.R
 import dev.amal.movieapp.core.utils.Constants.IMAGES_URL
-import dev.amal.movieapp.feature_movie_list.domain.model.Movie
+import dev.amal.movieapp.feature_movie_list.presentation.MovieItemState
 
 @Composable
 fun MovieItem(
-    movie: Movie,
-    getGenreById: () -> String
+    movie: MovieItemState,
+    onAddToFavorites: () -> Unit = {},
+    onRemoveFromFavorites: () -> Unit
 ) {
     Column(
         modifier = Modifier
@@ -61,7 +64,7 @@ fun MovieItem(
                     fontSize = 18.sp
                 )
                 Text(
-                    text = getGenreById(),
+                    text = movie.genres,
                     modifier = Modifier.alpha(0.6f),
                     style = MaterialTheme.typography.bodyLarge,
                     maxLines = 2,
@@ -82,10 +85,17 @@ fun MovieItem(
                     )
                 }
             }
-            IconButton(onClick = {}) {
+            if (movie.isFavoriteMovie) IconButton(onClick = onRemoveFromFavorites) {
+                Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Favorite",
+                    tint = Color.Red
+                )
+            }
+            else IconButton(onClick = onAddToFavorites) {
                 Icon(
                     imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = "Favorite"
+                    contentDescription = "FavoriteBorder"
                 )
             }
         }

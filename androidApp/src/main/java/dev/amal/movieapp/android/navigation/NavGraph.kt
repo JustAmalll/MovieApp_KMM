@@ -7,7 +7,8 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import dev.amal.movieapp.android.feature_favorites.presentation.FavoritesScreen
+import dev.amal.movieapp.android.feature_favorite_movies.presentation.AndroidFavoriteMoviesViewModel
+import dev.amal.movieapp.android.feature_favorite_movies.presentation.FavoritesScreen
 import dev.amal.movieapp.android.feature_movie_list.presentation.AndroidMovieViewModel
 import dev.amal.movieapp.android.feature_movie_list.presentation.MovieListScreen
 
@@ -18,17 +19,20 @@ fun SetupNavGraph(navController: NavHostController) {
         startDestination = Screen.MovieListScreen.route
     ) {
         composable(route = Screen.MovieListScreen.route) {
-            val movieViewModel = hiltViewModel<AndroidMovieViewModel>()
-            val state by movieViewModel.state.collectAsStateWithLifecycle()
+            val viewModel = hiltViewModel<AndroidMovieViewModel>()
+            val state by viewModel.state.collectAsStateWithLifecycle()
 
             MovieListScreen(
                 state = state,
-                onEvent = movieViewModel::onEvent,
-                getGenreById = movieViewModel::getGenreById
+                onEvent = viewModel::onEvent,
+                getGenreById = viewModel::getGenreById
             )
         }
         composable(route = Screen.FavoritesScreen.route) {
-            FavoritesScreen()
+            val viewModel = hiltViewModel<AndroidFavoriteMoviesViewModel>()
+            val state by viewModel.state.collectAsStateWithLifecycle()
+
+            FavoritesScreen(state = state, onEvent = viewModel::onEvent)
         }
     }
 }

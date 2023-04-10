@@ -21,6 +21,8 @@ class MovieRepositoryImpl(
             parameter("page", page)
         }
 
+        println("result $result")
+
         val response = result.body<MovieDto>()
         val popularMovies = response.results.map { it.toMovie() }
         return Resource.Success(popularMovies)

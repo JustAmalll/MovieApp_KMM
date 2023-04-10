@@ -5,6 +5,7 @@ import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
@@ -18,14 +19,16 @@ import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.MovieItem
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.SearchAppBar
-import dev.amal.movieapp.feature_movie_list.presentation.MovieState
+import dev.amal.movieapp.feature_movie_list.presentation.MovieItemState
+import dev.amal.movieapp.feature_movie_list.presentation.MovieListState
 import dev.amal.movieapp.feature_movie_list.presentation.MovieUIEvent
 import dev.amal.movieapp.feature_movie_list.presentation.MovieUIEvent.*
+import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun MovieListScreen(
-    state: MovieState,
+    state: MovieListState,
     onEvent: (MovieUIEvent) -> Unit,
     getGenreById: (List<Int>) -> String
 ) {
@@ -33,6 +36,9 @@ fun MovieListScreen(
 
     val snackBarHostState = remember { SnackbarHostState() }
     val focusManager = LocalFocusManager.current
+
+    val listState = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     val systemUiController = rememberSystemUiController()
     val darkTheme = isSystemInDarkTheme()
@@ -55,6 +61,42 @@ fun MovieListScreen(
         }
     }
 
+    var popularMovies by remember(state.popularMovies) {
+        mutableStateOf(
+            state.popularMovies.map { movie ->
+                MovieItemState(
+                    id = movie.id,
+                    backdrop_path = movie.backdrop_path,
+                    genres = getGenreById(movie.genre_ids),
+                    release_date = movie.release_date,
+                    title = movie.title,
+                    vote_average = movie.vote_average,
+                    isFavoriteMovie = state.favoriteMovieIds.any { favoriteMovieId ->
+                        favoriteMovieId == movie.id
+                    }
+                )
+            }
+        )
+    }
+
+    var searchedMovies by remember(state.searchedMovies) {
+        mutableStateOf(
+            state.searchedMovies.map { movie ->
+                MovieItemState(
+                    id = movie.id,
+                    backdrop_path = movie.backdrop_path,
+                    genres = getGenreById(movie.genre_ids),
+                    release_date = movie.release_date,
+                    title = movie.title,
+                    vote_average = movie.vote_average,
+                    isFavoriteMovie = state.favoriteMovieIds.any { favoriteMovieId ->
+                        favoriteMovieId == movie.id
+                    }
+                )
+            }
+        )
+    }
+
     Scaffold(
         snackbarHost = { SnackbarHost(hostState = snackBarHostState) },
         topBar = {
@@ -69,6 +111,10 @@ fun MovieListScreen(
                     onSearchClicked = {
                         onEvent(OnSearchClicked)
                         focusManager.clearFocus()
+
+                        scope.launch {
+                            listState.animateScrollToItem(0)
+                        }
                     }
                 )
                 else TopAppBar(
@@ -95,21 +141,46 @@ fun MovieListScreen(
             modifier = Modifier
                 .fillMaxSize()
                 .padding(paddingValues),
+            state = listState,
             contentPadding = PaddingValues(vertical = 18.dp)
         ) {
-            // TODO Code Refactor
-            val listToShow = state.searchedMovies.ifEmpty { state.popularMovies }
+            val listToDisplay = searchedMovies.ifEmpty { popularMovies }
 
-            itemsIndexed(listToShow) { index, movie ->
-                if (index >= listToShow.size - 1 && !state.endReached && !state.isLoading) {
-                    if (showSearchingTopBar) onEvent(LoadNextSearchedMovies)
-                    else onEvent(LoadNextMovies)
+            itemsIndexed(listToDisplay) { index, movie ->
+                if (index >= listToDisplay.size - 5 && !state.endReached && !state.isLoading) {
+                    if (searchedMovies.isEmpty()) onEvent(LoadNextMovies)
+                    else onEvent(LoadNextSearchedMovies)
                 }
                 MovieItem(
                     movie = movie,
-                    getGenreById = { getGenreById(movie.genre_ids) }
+                    onAddToFavorites = {
+                        onEvent(OnAddToFavorites(movie))
+
+                        if (searchedMovies.isEmpty()) {
+                            popularMovies = popularMovies.mapIndexed { i, item ->
+                                if (index == i) item.copy(isFavoriteMovie = !item.isFavoriteMovie)
+                                else item
+                            }
+                        } else searchedMovies = searchedMovies.mapIndexed { i, item ->
+                            if (index == i) item.copy(isFavoriteMovie = !item.isFavoriteMovie)
+                            else item
+                        }
+                    },
+                    onRemoveFromFavorites = {
+                        onEvent(OnRemoveFromFavorites(movie.id))
+
+                        if (searchedMovies.isEmpty()) {
+                            popularMovies = popularMovies.mapIndexed { i, item ->
+                                if (index == i) item.copy(isFavoriteMovie = !item.isFavoriteMovie)
+                                else item
+                            }
+                        } else searchedMovies = searchedMovies.mapIndexed { i, item ->
+                            if (index == i) item.copy(isFavoriteMovie = !item.isFavoriteMovie)
+                            else item
+                        }
+                    }
                 )
-                if (index < listToShow.lastIndex) {
+                if (index < listToDisplay.lastIndex) {
                     Divider(modifier = Modifier.padding(vertical = 24.dp))
                 }
             }
@@ -131,7 +202,7 @@ fun MovieListScreen(
 @Composable
 fun MovieListScreenPreview() {
     MovieListScreen(
-        state = MovieState(),
+        state = MovieListState(),
         onEvent = {},
         getGenreById = { "" }
     )

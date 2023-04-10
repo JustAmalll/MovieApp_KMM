@@ -2,24 +2,28 @@ package dev.amal.movieapp.feature_movie_list.presentation
 
 import dev.amal.movieapp.core.domain.util.toCommonStateFlow
 import dev.amal.movieapp.core.utils.Resource
+import dev.amal.movieapp.feature_favorite_movies.data.mappers.toFavoriteMovie
+import dev.amal.movieapp.feature_favorite_movies.domain.repository.FavoriteMoviesRepository
 import dev.amal.movieapp.feature_movie_list.domain.repository.MovieRepository
 import dev.amal.movieapp.feature_movie_list.pagination.DefaultPaginator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
 class MovieViewModel(
     private val movieRepository: MovieRepository,
+    private val favoriteMoviesRepository: FavoriteMoviesRepository,
     coroutineScope: CoroutineScope? = null
 ) {
     private val viewModelScope = coroutineScope ?: CoroutineScope(Dispatchers.Main)
 
-    private val _state = MutableStateFlow(MovieState())
+    private val _state = MutableStateFlow(MovieListState())
     val state = _state.toCommonStateFlow()
 
-    private val moviePaginator = DefaultPaginator(
+    private val popularMoviesPaginator = DefaultPaginator(
         initialKey = state.value.moviePage,
         onLoadUpdated = { isLoading ->
             _state.update { it.copy(isLoading = isLoading) }
@@ -34,11 +38,13 @@ class MovieViewModel(
             _state.update { it.copy(error = message) }
         },
         onSuccess = { items, newKey ->
-            _state.value = state.value.copy(
-                popularMovies = state.value.popularMovies + items,
-                moviePage = newKey,
-                endReached = items.isEmpty()
-            )
+            _state.update {
+                it.copy(
+                    popularMovies = state.value.popularMovies + items,
+                    moviePage = newKey,
+                    endReached = items.isEmpty()
+                )
+            }
         }
     )
 
@@ -57,17 +63,20 @@ class MovieViewModel(
             _state.update { it.copy(error = message) }
         },
         onSuccess = { items, newKey ->
-            _state.value = state.value.copy(
-                searchedMovies = state.value.searchedMovies + items,
-                searchPage = newKey,
-                endReached = items.isEmpty()
-            )
+            _state.update {
+                it.copy(
+                    searchedMovies = state.value.searchedMovies + items,
+                    searchPage = newKey,
+                    endReached = items.isEmpty()
+                )
+            }
         }
     )
 
     init {
-        loadNextMovies()
         getGenreMovieList()
+        loadNextMovies()
+        getFavoriteMovies()
     }
 
     fun onEvent(event: MovieUIEvent) {
@@ -76,18 +85,45 @@ class MovieViewModel(
             is MovieUIEvent.OnSearchTextChanged -> _state.update {
                 it.copy(searchText = event.value)
             }
-            MovieUIEvent.OnSearchClicked -> loadNextSearchedMovies()
+            MovieUIEvent.OnSearchClicked -> {
+                _state.update { it.copy(searchedMovies = emptyList(), searchPage = 1) }
+                searchPaginator.reset()
+                loadNextSearchedMovies()
+            }
             MovieUIEvent.LoadNextSearchedMovies -> loadNextSearchedMovies()
             MovieUIEvent.OnSearchCloseClicked -> _state.update {
                 it.copy(searchedMovies = emptyList())
             }
+            is MovieUIEvent.OnAddToFavorites -> addToFavorites(event.movie)
+            is MovieUIEvent.OnRemoveFromFavorites -> removeFromFavorites(event.movieId)
             MovieUIEvent.OnErrorSeen -> _state.update { it.copy(error = null) }
+        }
+    }
+
+    private fun addToFavorites(movie: MovieItemState) {
+        viewModelScope.launch {
+            favoriteMoviesRepository.addToFavorites(movie.toFavoriteMovie())
+        }
+    }
+
+    private fun removeFromFavorites(movieId: Long) {
+        viewModelScope.launch {
+            favoriteMoviesRepository.removeFromFavorites(movieId)
+        }
+    }
+
+    private fun getFavoriteMovies() {
+        viewModelScope.launch {
+            favoriteMoviesRepository.getFavoriteMovies().collectLatest { favoriteMovies ->
+                val favoriteMovieIds = favoriteMovies.map { favoriteMovie -> favoriteMovie.id }
+                _state.update { it.copy(favoriteMovieIds = favoriteMovieIds) }
+            }
         }
     }
 
     private fun loadNextMovies() {
         viewModelScope.launch {
-            moviePaginator.loadNextItems()
+            popularMoviesPaginator.loadNextItems()
         }
     }
 

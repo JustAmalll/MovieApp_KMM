@@ -7,7 +7,7 @@ data class MovieResultDto(
     val adult: Boolean,
     val backdrop_path: String? = null,
     val genre_ids: List<Int>,
-    val id: Int,
+    val id: Long,
     val original_language: String,
     val original_title: String,
     val overview: String,
@@ -21,6 +21,7 @@ data class MovieResultDto(
 )
 
 fun MovieResultDto.toMovie(): Movie = Movie(
+    id = id,
     backdrop_path = backdrop_path,
     genre_ids = genre_ids,
     release_date = release_date,
