@@ -3,7 +3,7 @@ package dev.amal.movieapp.feature_movie_list.presentation
 import dev.amal.movieapp.core.domain.util.toCommonStateFlow
 import dev.amal.movieapp.feature_favorite_movies.data.mappers.toFavoriteMovie
 import dev.amal.movieapp.feature_favorite_movies.domain.repository.FavoriteMoviesRepository
-import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkException
+import dev.amal.movieapp.feature_favorite_movies.domain.NetworkException
 import dev.amal.movieapp.feature_movie_list.domain.pagination.DefaultPaginator
 import dev.amal.movieapp.feature_movie_list.domain.repository.MovieRepository
 import kotlinx.coroutines.CoroutineScope

@@ -1,6 +1,6 @@
 package dev.amal.movieapp.feature_movie_list.presentation
 
-import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkError
+import dev.amal.movieapp.feature_favorite_movies.domain.NetworkError
 import dev.amal.movieapp.feature_movie_list.domain.model.Genre
 import dev.amal.movieapp.feature_movie_list.domain.model.Movie
 

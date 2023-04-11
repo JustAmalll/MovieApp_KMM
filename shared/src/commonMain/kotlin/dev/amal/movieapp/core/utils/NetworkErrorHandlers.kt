@@ -1,6 +1,6 @@
 package dev.amal.movieapp.core.utils
 
-import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkError
+import dev.amal.movieapp.feature_favorite_movies.domain.NetworkError
 import io.ktor.utils.io.errors.*
 
 fun Exception.handleNetworkException(): NetworkError {

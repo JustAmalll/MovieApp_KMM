@@ -1,7 +1,7 @@
 package dev.amal.movieapp.feature_movie_list.domain.pagination
 
-import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkError
-import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkException
+import dev.amal.movieapp.feature_favorite_movies.domain.NetworkError
+import dev.amal.movieapp.feature_favorite_movies.domain.NetworkException
 
 class DefaultPaginator<Key, Item>(
     private val initialKey: Key,

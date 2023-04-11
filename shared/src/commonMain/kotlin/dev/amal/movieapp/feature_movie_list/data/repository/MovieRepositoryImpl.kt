@@ -2,8 +2,8 @@ package dev.amal.movieapp.feature_movie_list.data.repository
 
 import dev.amal.movieapp.core.utils.handleHttpStatusCode
 import dev.amal.movieapp.core.utils.handleNetworkException
-import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkError
-import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkException
+import dev.amal.movieapp.feature_favorite_movies.domain.NetworkError
+import dev.amal.movieapp.feature_favorite_movies.domain.NetworkException
 import dev.amal.movieapp.feature_movie_list.data.remote.dto.GenresDto
 import dev.amal.movieapp.feature_movie_list.data.remote.dto.MovieDto
 import dev.amal.movieapp.feature_movie_list.data.remote.dto.toMovie

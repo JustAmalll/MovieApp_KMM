@@ -1,4 +1,4 @@
-package dev.amal.movieapp.feature_favorite_movies.domain.repository
+package dev.amal.movieapp.feature_favorite_movies.domain
 
 enum class NetworkError {
     SERVICE_UNAVAILABLE,

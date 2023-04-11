@@ -24,7 +24,7 @@ import dev.amal.movieapp.android.R
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.LoadingView
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.MovieItem
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.SearchAppBar
-import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkError
+import dev.amal.movieapp.feature_favorite_movies.domain.NetworkError
 import dev.amal.movieapp.feature_movie_list.presentation.MovieItemState
 import dev.amal.movieapp.feature_movie_list.presentation.MovieListState
 import dev.amal.movieapp.feature_movie_list.presentation.MovieUIEvent
