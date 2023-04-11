@@ -11,6 +11,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -38,7 +39,7 @@ fun MovieListScreen(
     onEvent: (MovieUIEvent) -> Unit,
     getGenreById: (List<Int>) -> String
 ) {
-    var showSearchingContent by remember { mutableStateOf(false) }
+    var showSearchingContent by rememberSaveable { mutableStateOf(false) }
     val snackBarHostState = remember { SnackbarHostState() }
 
     val context = LocalContext.current
@@ -137,7 +138,7 @@ fun MovieListScreen(
                 }
                 var searchedMovies by remember(state.searchedMovies) {
                     mutableStateOf(
-                        state.searchedMovies.map { movie ->
+                        state.searchedMovies?.map { movie ->
                             MovieItemState(
                                 id = movie.id,
                                 backdrop_path = movie.backdrop_path,
@@ -151,6 +152,9 @@ fun MovieListScreen(
                         }
                     )
                 }
+                val listToDisplay = if (searchedMovies != null) searchedMovies ?: emptyList()
+                else popularMovies
+
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
@@ -158,11 +162,9 @@ fun MovieListScreen(
                     state = lazyListState,
                     contentPadding = PaddingValues(vertical = 18.dp)
                 ) {
-                    val listToDisplay = searchedMovies.ifEmpty { popularMovies }
-
                     itemsIndexed(listToDisplay) { index, movie ->
                         if (index >= listToDisplay.size - 5 && !state.isNextItemsLoading) {
-                            if (searchedMovies.isEmpty() && !state.popularMoviesEndReached) {
+                            if (searchedMovies == null && !state.popularMoviesEndReached) {
                                 onEvent(LoadNextMovies)
                             } else if (!state.searchedMoviesEndReached) {
                                 onEvent(LoadNextSearchedMovies)
@@ -174,11 +176,11 @@ fun MovieListScreen(
                                 if (movie.isFavoriteMovie) onEvent(RemoveFromFavorites(movie.id))
                                 else onEvent(AddToFavorites(movie = movie))
 
-                                if (searchedMovies.isEmpty()) popularMovies = onLikeButtonClick(
+                                if (searchedMovies == null) popularMovies = onLikeButtonClick(
                                     items = popularMovies, itemIndex = index
                                 )
                                 else searchedMovies = onLikeButtonClick(
-                                    items = searchedMovies, itemIndex = index
+                                    items = searchedMovies ?: emptyList(), itemIndex = index
                                 )
                             }
                         )

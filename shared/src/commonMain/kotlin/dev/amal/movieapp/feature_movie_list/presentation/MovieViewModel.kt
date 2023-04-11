@@ -2,8 +2,8 @@ package dev.amal.movieapp.feature_movie_list.presentation
 
 import dev.amal.movieapp.core.domain.util.toCommonStateFlow
 import dev.amal.movieapp.feature_favorite_movies.data.mappers.toFavoriteMovie
-import dev.amal.movieapp.feature_favorite_movies.domain.repository.FavoriteMoviesRepository
 import dev.amal.movieapp.feature_favorite_movies.domain.NetworkException
+import dev.amal.movieapp.feature_favorite_movies.domain.repository.FavoriteMoviesRepository
 import dev.amal.movieapp.feature_movie_list.domain.pagination.DefaultPaginator
 import dev.amal.movieapp.feature_movie_list.domain.repository.MovieRepository
 import kotlinx.coroutines.CoroutineScope
@@ -75,7 +75,7 @@ class MovieViewModel(
         onSuccess = { items, newKey ->
             _state.update {
                 it.copy(
-                    searchedMovies = state.value.searchedMovies + items,
+                    searchedMovies = (state.value.searchedMovies ?: emptyList()) + items,
                     searchPage = newKey,
                     searchedMoviesEndReached = items.isEmpty()
                 )
@@ -98,7 +98,7 @@ class MovieViewModel(
             MovieUIEvent.OnSearchClicked -> {
                 _state.update {
                     it.copy(
-                        searchedMovies = emptyList(),
+                        searchedMovies = null,
                         searchPage = 1,
                         searchedMoviesEndReached = false
                     )
@@ -108,7 +108,7 @@ class MovieViewModel(
             }
             MovieUIEvent.LoadNextSearchedMovies -> loadNextSearchedMovies()
             MovieUIEvent.OnSearchCloseClicked -> _state.update {
-                it.copy(searchedMovies = emptyList(), searchedMoviesEndReached = false)
+                it.copy(searchedMovies = null, searchedMoviesEndReached = false)
             }
             is MovieUIEvent.AddToFavorites -> addToFavorites(event.movie)
             is MovieUIEvent.RemoveFromFavorites -> removeFromFavorites(event.movieId)
@@ -145,7 +145,8 @@ class MovieViewModel(
 
     private fun loadNextSearchedMovies() {
         viewModelScope.launch {
-            searchedMoviesPaginator.loadNextItems()
+            if (state.value.searchText.isNotEmpty()) searchedMoviesPaginator.loadNextItems()
+            else _state.update { it.copy(searchedMovies = null) }
         }
     }
 
