@@ -1,4 +1,4 @@
-package dev.amal.movieapp.feature_movie_list.data.local
+package dev.amal.movieapp.core.data.local
 
 import com.squareup.sqldelight.db.SqlDriver
 

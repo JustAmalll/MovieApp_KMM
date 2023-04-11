@@ -1,9 +1,8 @@
 package dev.amal.movieapp.feature_movie_list.data.repository
 
 import dev.amal.movieapp.core.utils.Resource
-import dev.amal.movieapp.feature_movie_list.data.remote.dto.GenreListDto
+import dev.amal.movieapp.feature_movie_list.data.remote.dto.GenresDto
 import dev.amal.movieapp.feature_movie_list.data.remote.dto.MovieDto
-import dev.amal.movieapp.feature_movie_list.data.remote.dto.toGenre
 import dev.amal.movieapp.feature_movie_list.data.remote.dto.toMovie
 import dev.amal.movieapp.feature_movie_list.domain.model.Genre
 import dev.amal.movieapp.feature_movie_list.domain.model.Movie
@@ -29,9 +28,8 @@ class MovieRepositoryImpl(
     override suspend fun getGenreMovieList(): Resource<List<Genre>> {
         val result = client.get("genre/movie/list")
 
-        val response = result.body<GenreListDto>()
-        val genres = response.genres.map { it.toGenre() }
-        return Resource.Success(genres)
+        val response = result.body<GenresDto>()
+        return Resource.Success(response.genres)
     }
 
     override suspend fun searchMovie(page: Int, query: String): Resource<List<Movie>> {

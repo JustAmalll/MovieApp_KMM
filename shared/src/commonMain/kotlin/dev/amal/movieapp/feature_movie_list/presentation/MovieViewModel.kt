@@ -85,13 +85,13 @@ class MovieViewModel(
 
     init {
         getGenreMovieList()
-        loadNextMovies()
-        getFavoriteMovies()
+        loadNextPopularMovies()
+        getFavoriteMovieIds()
     }
 
     fun onEvent(event: MovieUIEvent) {
         when (event) {
-            MovieUIEvent.LoadNextMovies -> loadNextMovies()
+            MovieUIEvent.LoadNextMovies -> loadNextPopularMovies()
             is MovieUIEvent.OnSearchTextChanged -> _state.update {
                 it.copy(searchText = event.value)
             }
@@ -128,7 +128,7 @@ class MovieViewModel(
         }
     }
 
-    private fun getFavoriteMovies() {
+    private fun getFavoriteMovieIds() {
         viewModelScope.launch {
             favoriteMoviesRepository.getFavoriteMovies().collectLatest { favoriteMovies ->
                 val favoriteMovieIds = favoriteMovies.map { favoriteMovie -> favoriteMovie.id }
@@ -137,7 +137,7 @@ class MovieViewModel(
         }
     }
 
-    private fun loadNextMovies() {
+    private fun loadNextPopularMovies() {
         viewModelScope.launch {
             popularMoviesPaginator.loadNextItems()
         }

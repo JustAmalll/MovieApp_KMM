@@ -13,7 +13,6 @@ import kotlinx.coroutines.flow.map
 class FavoriteMoviesRepositoryImpl(
     db: FavoriteMoviesDatabase
 ) : FavoriteMoviesRepository {
-
     private val queries = db.favoriteMoviesQueries
 
     override suspend fun getFavoriteMovies(): CommonFlow<List<FavoriteMovie>> {
