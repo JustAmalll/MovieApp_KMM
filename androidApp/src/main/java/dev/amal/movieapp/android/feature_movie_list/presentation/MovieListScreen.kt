@@ -12,6 +12,7 @@ import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -23,6 +24,7 @@ import dev.amal.movieapp.android.R
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.LoadingView
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.MovieItem
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.SearchAppBar
+import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkError
 import dev.amal.movieapp.feature_movie_list.presentation.MovieItemState
 import dev.amal.movieapp.feature_movie_list.presentation.MovieListState
 import dev.amal.movieapp.feature_movie_list.presentation.MovieUIEvent
@@ -39,6 +41,7 @@ fun MovieListScreen(
     var showSearchingContent by remember { mutableStateOf(false) }
     val snackBarHostState = remember { SnackbarHostState() }
 
+    val context = LocalContext.current
     val focusManager = LocalFocusManager.current
 
     val lazyListState = rememberLazyListState()
@@ -60,7 +63,13 @@ fun MovieListScreen(
 
     LaunchedEffect(key1 = state.error) {
         state.error?.let { error ->
-            snackBarHostState.showSnackbar(message = error)
+            val message = when (error) {
+                NetworkError.SERVICE_UNAVAILABLE -> context.getString(R.string.service_unavailable_error)
+                NetworkError.CLIENT_ERROR -> context.getString(R.string.client_error)
+                NetworkError.SERVER_ERROR -> context.getString(R.string.server_error)
+                NetworkError.UNKNOWN_ERROR -> context.getString(R.string.unknown_error)
+            }
+            snackBarHostState.showSnackbar(message = message)
             onEvent(OnErrorSeen)
         }
     }

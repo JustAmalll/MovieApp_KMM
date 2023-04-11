@@ -1,9 +1,9 @@
 package dev.amal.movieapp.feature_movie_list.presentation
 
 import dev.amal.movieapp.core.domain.util.toCommonStateFlow
-import dev.amal.movieapp.core.utils.Resource
 import dev.amal.movieapp.feature_favorite_movies.data.mappers.toFavoriteMovie
 import dev.amal.movieapp.feature_favorite_movies.domain.repository.FavoriteMoviesRepository
+import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkException
 import dev.amal.movieapp.feature_movie_list.domain.pagination.DefaultPaginator
 import dev.amal.movieapp.feature_movie_list.domain.repository.MovieRepository
 import kotlinx.coroutines.CoroutineScope
@@ -152,13 +152,11 @@ class MovieViewModel(
     private fun getGenreMovieList() {
         viewModelScope.launch {
             _state.update { it.copy(isGenresLoading = true) }
-            when (val result = movieRepository.getGenreMovieList()) {
-                is Resource.Success -> _state.update {
-                    it.copy(genres = result.data ?: emptyList())
-                }
-                is Resource.Error -> _state.update {
-                    it.copy(error = result.message ?: "An unknown error occurred")
-                }
+            try {
+                val result = movieRepository.getGenreMovieList()
+                _state.update { it.copy(genres = result) }
+            } catch (exception: NetworkException) {
+                _state.update { it.copy(error = exception.error) }
             }
             _state.update { it.copy(isGenresLoading = false) }
         }

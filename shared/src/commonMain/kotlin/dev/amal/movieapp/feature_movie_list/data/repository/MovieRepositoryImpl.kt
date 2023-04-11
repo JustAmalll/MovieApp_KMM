@@ -1,6 +1,9 @@
 package dev.amal.movieapp.feature_movie_list.data.repository
 
-import dev.amal.movieapp.core.utils.Resource
+import dev.amal.movieapp.core.utils.handleHttpStatusCode
+import dev.amal.movieapp.core.utils.handleNetworkException
+import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkError
+import dev.amal.movieapp.feature_favorite_movies.domain.repository.NetworkException
 import dev.amal.movieapp.feature_movie_list.data.remote.dto.GenresDto
 import dev.amal.movieapp.feature_movie_list.data.remote.dto.MovieDto
 import dev.amal.movieapp.feature_movie_list.data.remote.dto.toMovie
@@ -15,31 +18,64 @@ class MovieRepositoryImpl(
     private val client: HttpClient
 ) : MovieRepository {
 
-    override suspend fun getPopularMovies(page: Int): Resource<List<Movie>> {
-        val result = client.get("movie/popular") {
-            parameter("page", page)
+    override suspend fun getPopularMovies(page: Int): List<Movie> {
+        val result = try {
+            client.get("movie/popular") {
+                parameter("page", page)
+            }
+        } catch (exception: Exception) {
+            val error = exception.handleNetworkException()
+            throw NetworkException(error)
         }
 
-        val response = result.body<MovieDto>()
-        val popularMovies = response.results.map { it.toMovie() }
-        return Resource.Success(popularMovies)
+        val error = result.status.value.handleHttpStatusCode()
+        if (error != null) throw NetworkException(error)
+
+        return try {
+            val response = result.body<MovieDto>()
+            response.results.map { it.toMovie() }
+        } catch (exception: Exception) {
+            throw NetworkException(NetworkError.SERVER_ERROR)
+        }
     }
 
-    override suspend fun getGenreMovieList(): Resource<List<Genre>> {
-        val result = client.get("genre/movie/list")
-
-        val response = result.body<GenresDto>()
-        return Resource.Success(response.genres)
-    }
-
-    override suspend fun searchMovie(page: Int, query: String): Resource<List<Movie>> {
-        val result = client.get("search/movie") {
-            parameter("query", query)
-            parameter("page", page)
+    override suspend fun getGenreMovieList(): List<Genre> {
+        val result = try {
+            client.get("genre/movie/list")
+        } catch (exception: Exception) {
+            val error = exception.handleNetworkException()
+            throw NetworkException(error)
         }
 
-        val response = result.body<MovieDto>()
-        val searchedMovie = response.results.map { it.toMovie() }
-        return Resource.Success(searchedMovie)
+        val error = result.status.value.handleHttpStatusCode()
+        if (error != null) throw NetworkException(error)
+
+        return try {
+            result.body<GenresDto>().genres
+        } catch (exception: Exception) {
+            throw NetworkException(NetworkError.SERVER_ERROR)
+        }
+    }
+
+    override suspend fun searchMovie(page: Int, query: String): List<Movie> {
+        val result = try {
+            client.get("search/movie") {
+                parameter("query", query)
+                parameter("page", page)
+            }
+        } catch (exception: Exception) {
+            val error = exception.handleNetworkException()
+            throw NetworkException(error)
+        }
+
+        val error = result.status.value.handleHttpStatusCode()
+        if (error != null) throw NetworkException(error)
+
+        return try {
+            val response = result.body<MovieDto>()
+            response.results.map { it.toMovie() }
+        } catch (exception: Exception) {
+            throw NetworkException(NetworkError.SERVER_ERROR)
+        }
     }
 }

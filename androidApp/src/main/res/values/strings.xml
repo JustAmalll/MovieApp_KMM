@@ -22,4 +22,8 @@
 
     // Movie List Screen
     <string name="popular_movies">Popular Movies</string>
+    <string name="unknown_error">Oops, an unknown error happened.</string>
+    <string name="server_error">Oops, an error happened. Please try again later.</string>
+    <string name="client_error">Oops, an error happened. Please contact the support.</string>
+    <string name="service_unavailable_error">Oops! Couldn\'t reach server. Check your internet connection.</string>
 </resources>
