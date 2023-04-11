@@ -16,6 +16,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
@@ -42,7 +43,7 @@ fun MovieItem(
                 if (isImageLoading) CircularProgressIndicator()
                 else if (movie.backdrop_path == null) Icon(
                     imageVector = Icons.Default.Error,
-                    contentDescription = "Error"
+                    contentDescription = stringResource(R.string.error)
                 )
                 AsyncImage(
                     modifier = Modifier
@@ -80,7 +81,7 @@ fun MovieItem(
                     Image(
                         modifier = Modifier.size(16.dp),
                         painter = painterResource(id = R.drawable.ic_star),
-                        contentDescription = "Star"
+                        contentDescription = stringResource(R.string.star)
                     )
                     Spacer(modifier = Modifier.width(4.dp))
                     Text(
@@ -93,11 +94,11 @@ fun MovieItem(
             IconButton(onClick = onLikeButtonClicked) {
                 if (movie.isFavoriteMovie) Icon(
                     imageVector = Icons.Default.Favorite,
-                    contentDescription = "Favorite",
+                    contentDescription = stringResource(R.string.favorite),
                     tint = Color.Red
                 ) else Icon(
                     imageVector = Icons.Default.FavoriteBorder,
-                    contentDescription = "FavoriteBorder"
+                    contentDescription = stringResource(R.string.favorite_border)
                 )
             }
         }

@@ -8,7 +8,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import dev.amal.movieapp.android.feature_favorite_movies.presentation.AndroidFavoriteMoviesViewModel
-import dev.amal.movieapp.android.feature_favorite_movies.presentation.FavoritesScreen
+import dev.amal.movieapp.android.feature_favorite_movies.presentation.FavoriteMoviesScreen
 import dev.amal.movieapp.android.feature_movie_list.presentation.AndroidMovieViewModel
 import dev.amal.movieapp.android.feature_movie_list.presentation.MovieListScreen
 
@@ -32,7 +32,7 @@ fun SetupNavGraph(navController: NavHostController) {
             val viewModel = hiltViewModel<AndroidFavoriteMoviesViewModel>()
             val state by viewModel.state.collectAsStateWithLifecycle()
 
-            FavoritesScreen(state = state, onEvent = viewModel::onEvent)
+            FavoriteMoviesScreen(state = state, onEvent = viewModel::onEvent)
         }
     }
 }

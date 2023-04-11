@@ -13,11 +13,13 @@ import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
+import dev.amal.movieapp.android.R
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.LoadingView
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.MovieItem
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.SearchAppBar
@@ -84,7 +86,7 @@ fun MovieListScreen(
                 ) else TopAppBar(
                     title = {
                         Text(
-                            text = "Popular Movies",
+                            text = stringResource(R.string.popular_movies),
                             fontWeight = FontWeight.Bold,
                             fontSize = 26.sp
                         )
@@ -93,7 +95,7 @@ fun MovieListScreen(
                         IconButton(onClick = { showSearchingContent = true }) {
                             Icon(
                                 imageVector = Icons.Default.Search,
-                                contentDescription = "Search"
+                                contentDescription = stringResource(id = R.string.search)
                             )
                         }
                     }

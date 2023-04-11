@@ -6,9 +6,11 @@ import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import dev.amal.movieapp.android.R
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.MovieItem
 import dev.amal.movieapp.feature_favorite_movies.data.mappers.toMovieItemState
 import dev.amal.movieapp.feature_favorite_movies.presentation.FavoriteMoviesState
@@ -17,7 +19,7 @@ import dev.amal.movieapp.feature_favorite_movies.presentation.FavoriteMoviesUIEv
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun FavoritesScreen(
+fun FavoriteMoviesScreen(
     state: FavoriteMoviesState,
     onEvent: (FavoriteMoviesUIEvent) -> Unit
 ) {
@@ -26,7 +28,7 @@ fun FavoritesScreen(
             TopAppBar(
                 title = {
                     Text(
-                        text = "Favorite Movies",
+                        text = stringResource(R.string.favorite_movies),
                         fontWeight = FontWeight.Bold,
                         fontSize = 26.sp
                     )

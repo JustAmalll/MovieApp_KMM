@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Movie App</string>
+
+    // Navigation Bar
+    <string name="movies">Movies</string>
+    <string name="favorites">Favorites</string>
+
+    // Favorite Movies Screen
+    <string name="favorite_movies">Favorite Movies</string>
+
+    // Movie Item
+    <string name="error">Error</string>
+    <string name="star">Star</string>
+    <string name="favorite">Favorite</string>
+    <string name="favorite_border">FavoriteBorder</string>
+
+    // Search App Bar
+    <string name="search_here">Search here…</string>
+    <string name="search">Search</string>
+    <string name="close">Close</string>
+
+    // Movie List Screen
+    <string name="popular_movies">Popular Movies</string>
+</resources>

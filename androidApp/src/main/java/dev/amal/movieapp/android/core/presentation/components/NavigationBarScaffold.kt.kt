@@ -8,8 +8,10 @@ import androidx.compose.material.icons.filled.Movie
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
+import dev.amal.movieapp.android.R
 import dev.amal.movieapp.android.navigation.Screen
 
 @Composable
@@ -23,12 +25,12 @@ fun NavigationBarScaffold(
         BottomNavItem(
             route = Screen.MovieListScreen.route,
             icon = Icons.Default.Movie,
-            contentDescription = "Movies"
+            contentDescription = stringResource(R.string.movies)
         ),
         BottomNavItem(
             route = Screen.FavoritesScreen.route,
             icon = Icons.Default.Favorite,
-            contentDescription = "Favorites"
+            contentDescription = stringResource(R.string.favorites)
         )
     )
 
