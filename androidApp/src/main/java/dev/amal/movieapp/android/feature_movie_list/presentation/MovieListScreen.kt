@@ -22,6 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.google.accompanist.systemuicontroller.rememberSystemUiController
 import dev.amal.movieapp.android.R
+import dev.amal.movieapp.android.feature_movie_list.presentation.components.EmptySearchContent
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.LoadingView
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.MovieItem
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.SearchAppBar
@@ -152,6 +153,9 @@ fun MovieListScreen(
                         }
                     )
                 }
+
+                searchedMovies?.let { if (it.isEmpty()) EmptySearchContent() }
+
                 val listToDisplay = if (searchedMovies != null) searchedMovies ?: emptyList()
                 else popularMovies
 

@@ -28,4 +28,7 @@
     <string name="server_error">Oops, an error happened. Please try again later.</string>
     <string name="client_error">Oops, an error happened. Please contact the support.</string>
     <string name="service_unavailable_error">Oops! Couldn\'t reach server. Check your internet connection.</string>
+
+    // Empty Favorite Movies Content
+    <string name="empty_favorites_text">Looks like you haven\'t added any favorite movies yet :(</string>
 </resources>

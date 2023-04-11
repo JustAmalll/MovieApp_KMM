@@ -1,5 +1,6 @@
 package dev.amal.movieapp.android.feature_favorite_movies.presentation
 
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.itemsIndexed
@@ -11,6 +12,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import dev.amal.movieapp.android.R
+import dev.amal.movieapp.android.feature_favorite_movies.presentation.components.EmptyFavoriteMoviesContent
 import dev.amal.movieapp.android.feature_movie_list.presentation.components.MovieItem
 import dev.amal.movieapp.feature_favorite_movies.data.mappers.toMovieItemState
 import dev.amal.movieapp.feature_favorite_movies.presentation.FavoriteMoviesState
@@ -36,29 +38,33 @@ fun FavoriteMoviesScreen(
             )
         }
     ) { paddingValues ->
-        LazyColumn(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(paddingValues),
-            contentPadding = PaddingValues(vertical = 18.dp)
-        ) {
-            itemsIndexed(state.favoriteMovies) { index, movie ->
-                MovieItem(
-                    movie = movie.toMovieItemState(),
-                    onLikeButtonClicked = { onEvent(RemoveFromFavorites(movie.id)) }
-                )
-                if (index < state.favoriteMovies.lastIndex) {
-                    Divider(modifier = Modifier.padding(vertical = 24.dp))
+
+        AnimatedContent(targetState = state.favoriteMovies.isEmpty()) { isEmpty ->
+            if (isEmpty) EmptyFavoriteMoviesContent()
+            else LazyColumn(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(paddingValues),
+                contentPadding = PaddingValues(vertical = 18.dp)
+            ) {
+                itemsIndexed(state.favoriteMovies) { index, movie ->
+                    MovieItem(
+                        movie = movie.toMovieItemState(),
+                        onLikeButtonClicked = { onEvent(RemoveFromFavorites(movie.id)) }
+                    )
+                    if (index < state.favoriteMovies.lastIndex) {
+                        Divider(modifier = Modifier.padding(vertical = 24.dp))
+                    }
                 }
-            }
-            item {
-                if (state.isLoading) Row(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .padding(8.dp),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    CircularProgressIndicator()
+                item {
+                    if (state.isLoading) Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .padding(8.dp),
+                        horizontalArrangement = Arrangement.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
                 }
             }
         }

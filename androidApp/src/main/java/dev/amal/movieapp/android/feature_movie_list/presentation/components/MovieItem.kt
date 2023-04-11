@@ -69,7 +69,7 @@ fun MovieItem(
                     fontWeight = FontWeight.Medium,
                     fontSize = 18.sp
                 )
-                Text(
+                if (movie.genres.isNotEmpty()) Text(
                     text = movie.genres,
                     modifier = Modifier.alpha(0.6f),
                     style = MaterialTheme.typography.bodyLarge,
