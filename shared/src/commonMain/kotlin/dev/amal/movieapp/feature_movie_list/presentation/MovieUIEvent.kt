@@ -6,7 +6,7 @@ sealed interface MovieUIEvent {
     object OnSearchCloseClicked : MovieUIEvent
     object LoadNextMovies : MovieUIEvent
     object LoadNextSearchedMovies : MovieUIEvent
-    data class OnAddToFavorites(val movie: MovieItemState) : MovieUIEvent
-    data class OnRemoveFromFavorites(val movieId: Long) : MovieUIEvent
+    data class AddToFavorites(val movie: MovieItemState) : MovieUIEvent
+    data class RemoveFromFavorites(val movieId: Long) : MovieUIEvent
     object OnErrorSeen : MovieUIEvent
 }

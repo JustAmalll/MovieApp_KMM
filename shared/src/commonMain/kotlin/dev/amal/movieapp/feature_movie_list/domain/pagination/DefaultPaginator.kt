@@ -1,4 +1,4 @@
-package dev.amal.movieapp.feature_movie_list.pagination
+package dev.amal.movieapp.feature_movie_list.domain.pagination
 
 import dev.amal.movieapp.core.utils.Resource
 
@@ -6,7 +6,7 @@ class DefaultPaginator<Key, Item>(
     private val initialKey: Key,
     private inline val onLoadUpdated: (Boolean) -> Unit,
     private inline val onRequest: suspend (nextKey: Key) -> Resource<List<Item>>,
-    private inline val getNextKey: suspend (List<Item>) -> Key,
+    private inline val getNextKey: suspend () -> Key,
     private inline val onError: suspend (String?) -> Unit,
     private inline val onSuccess: suspend (items: List<Item>, newKey: Key) -> Unit
 ) : Paginator<Key, Item> {
@@ -21,7 +21,7 @@ class DefaultPaginator<Key, Item>(
 
         when (val result = onRequest(currentKey)) {
             is Resource.Success -> result.data?.let { items ->
-                currentKey = getNextKey(items)
+                currentKey = getNextKey()
                 onSuccess(items, currentKey)
             }
             is Resource.Error -> {

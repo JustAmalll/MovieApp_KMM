@@ -13,7 +13,7 @@ import dev.amal.movieapp.android.feature_movie_list.presentation.components.Movi
 import dev.amal.movieapp.feature_favorite_movies.data.mappers.toMovieItemState
 import dev.amal.movieapp.feature_favorite_movies.presentation.FavoriteMoviesState
 import dev.amal.movieapp.feature_favorite_movies.presentation.FavoriteMoviesUIEvent
-import dev.amal.movieapp.feature_favorite_movies.presentation.FavoriteMoviesUIEvent.OnRemoveFromFavorites
+import dev.amal.movieapp.feature_favorite_movies.presentation.FavoriteMoviesUIEvent.RemoveFromFavorites
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -43,7 +43,7 @@ fun FavoritesScreen(
             itemsIndexed(state.favoriteMovies) { index, movie ->
                 MovieItem(
                     movie = movie.toMovieItemState(),
-                    onRemoveFromFavorites = { onEvent(OnRemoveFromFavorites(movie.id)) }
+                    onLikeButtonClicked = { onEvent(RemoveFromFavorites(movie.id)) }
                 )
                 if (index < state.favoriteMovies.lastIndex) {
                     Divider(modifier = Modifier.padding(vertical = 24.dp))

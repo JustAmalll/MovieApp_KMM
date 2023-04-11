@@ -4,8 +4,8 @@ import dev.amal.movieapp.core.domain.util.toCommonStateFlow
 import dev.amal.movieapp.core.utils.Resource
 import dev.amal.movieapp.feature_favorite_movies.data.mappers.toFavoriteMovie
 import dev.amal.movieapp.feature_favorite_movies.domain.repository.FavoriteMoviesRepository
+import dev.amal.movieapp.feature_movie_list.domain.pagination.DefaultPaginator
 import dev.amal.movieapp.feature_movie_list.domain.repository.MovieRepository
-import dev.amal.movieapp.feature_movie_list.pagination.DefaultPaginator
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -26,7 +26,12 @@ class MovieViewModel(
     private val popularMoviesPaginator = DefaultPaginator(
         initialKey = state.value.moviePage,
         onLoadUpdated = { isLoading ->
-            _state.update { it.copy(isLoading = isLoading) }
+            _state.update {
+                it.copy(
+                    isMoviesLoading = if (state.value.moviePage == 1) isLoading else false,
+                    isNextItemsLoading = isLoading
+                )
+            }
         },
         onRequest = { nextPage ->
             movieRepository.getPopularMovies(page = nextPage)
@@ -42,16 +47,21 @@ class MovieViewModel(
                 it.copy(
                     popularMovies = state.value.popularMovies + items,
                     moviePage = newKey,
-                    endReached = items.isEmpty()
+                    popularMoviesEndReached = items.isEmpty()
                 )
             }
         }
     )
 
-    private val searchPaginator = DefaultPaginator(
+    private val searchedMoviesPaginator = DefaultPaginator(
         initialKey = state.value.searchPage,
         onLoadUpdated = { isLoading ->
-            _state.update { it.copy(isLoading = isLoading) }
+            _state.update {
+                it.copy(
+                    isMoviesLoading = if (state.value.searchPage == 1) isLoading else false,
+                    isNextItemsLoading = isLoading
+                )
+            }
         },
         onRequest = { nextPage ->
             movieRepository.searchMovie(query = state.value.searchText, page = nextPage)
@@ -67,7 +77,7 @@ class MovieViewModel(
                 it.copy(
                     searchedMovies = state.value.searchedMovies + items,
                     searchPage = newKey,
-                    endReached = items.isEmpty()
+                    searchedMoviesEndReached = items.isEmpty()
                 )
             }
         }
@@ -86,16 +96,22 @@ class MovieViewModel(
                 it.copy(searchText = event.value)
             }
             MovieUIEvent.OnSearchClicked -> {
-                _state.update { it.copy(searchedMovies = emptyList(), searchPage = 1) }
-                searchPaginator.reset()
+                _state.update {
+                    it.copy(
+                        searchedMovies = emptyList(),
+                        searchPage = 1,
+                        searchedMoviesEndReached = false
+                    )
+                }
+                searchedMoviesPaginator.reset()
                 loadNextSearchedMovies()
             }
             MovieUIEvent.LoadNextSearchedMovies -> loadNextSearchedMovies()
             MovieUIEvent.OnSearchCloseClicked -> _state.update {
-                it.copy(searchedMovies = emptyList())
+                it.copy(searchedMovies = emptyList(), searchedMoviesEndReached = false)
             }
-            is MovieUIEvent.OnAddToFavorites -> addToFavorites(event.movie)
-            is MovieUIEvent.OnRemoveFromFavorites -> removeFromFavorites(event.movieId)
+            is MovieUIEvent.AddToFavorites -> addToFavorites(event.movie)
+            is MovieUIEvent.RemoveFromFavorites -> removeFromFavorites(event.movieId)
             MovieUIEvent.OnErrorSeen -> _state.update { it.copy(error = null) }
         }
     }
@@ -129,12 +145,13 @@ class MovieViewModel(
 
     private fun loadNextSearchedMovies() {
         viewModelScope.launch {
-            searchPaginator.loadNextItems()
+            searchedMoviesPaginator.loadNextItems()
         }
     }
 
     private fun getGenreMovieList() {
         viewModelScope.launch {
+            _state.update { it.copy(isGenresLoading = true) }
             when (val result = movieRepository.getGenreMovieList()) {
                 is Resource.Success -> _state.update {
                     it.copy(genres = result.data ?: emptyList())
@@ -143,6 +160,7 @@ class MovieViewModel(
                     it.copy(error = result.message ?: "An unknown error occurred")
                 }
             }
+            _state.update { it.copy(isGenresLoading = false) }
         }
     }
 

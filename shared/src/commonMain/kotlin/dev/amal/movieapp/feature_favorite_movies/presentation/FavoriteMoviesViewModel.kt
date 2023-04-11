@@ -23,7 +23,7 @@ class FavoriteMoviesViewModel(
 
     fun onEvent(event: FavoriteMoviesUIEvent) {
         when (event) {
-            is FavoriteMoviesUIEvent.OnRemoveFromFavorites -> {
+            is FavoriteMoviesUIEvent.RemoveFromFavorites -> {
                 removeFromFavorites(event.movieId)
             }
         }

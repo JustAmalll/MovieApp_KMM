@@ -1,6 +1,5 @@
 package dev.amal.movieapp.android.feature_movie_list.presentation.components
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -29,8 +28,7 @@ import dev.amal.movieapp.feature_movie_list.presentation.MovieItemState
 @Composable
 fun MovieItem(
     movie: MovieItemState,
-    onAddToFavorites: () -> Unit = {},
-    onRemoveFromFavorites: () -> Unit
+    onLikeButtonClicked: () -> Unit
 ) {
     var isImageLoading by remember { mutableStateOf(true) }
 
@@ -92,20 +90,15 @@ fun MovieItem(
                     )
                 }
             }
-            AnimatedContent(targetState = movie.isFavoriteMovie) { isFavoriteMovie ->
-                if (isFavoriteMovie) IconButton(onClick = onRemoveFromFavorites) {
-                    Icon(
-                        imageVector = Icons.Default.Favorite,
-                        contentDescription = "Favorite",
-                        tint = Color.Red
-                    )
-                }
-                else IconButton(onClick = onAddToFavorites) {
-                    Icon(
-                        imageVector = Icons.Default.FavoriteBorder,
-                        contentDescription = "FavoriteBorder"
-                    )
-                }
+            IconButton(onClick = onLikeButtonClicked) {
+                if (movie.isFavoriteMovie) Icon(
+                    imageVector = Icons.Default.Favorite,
+                    contentDescription = "Favorite",
+                    tint = Color.Red
+                ) else Icon(
+                    imageVector = Icons.Default.FavoriteBorder,
+                    contentDescription = "FavoriteBorder"
+                )
             }
         }
     }
