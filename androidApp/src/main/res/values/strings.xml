@@ -31,4 +31,7 @@
 
     // Empty Favorite Movies Content
     <string name="empty_favorites_text">Looks like you haven\'t added any favorite movies yet :(</string>
+
+    // Empty Search Content
+    <string name="nothing_found">Nothing found :(</string>
 </resources>

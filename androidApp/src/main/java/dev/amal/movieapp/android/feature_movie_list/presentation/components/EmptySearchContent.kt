@@ -9,6 +9,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
@@ -28,7 +29,7 @@ fun EmptySearchContent() {
         )
         Spacer(modifier = Modifier.height(18.dp))
         Text(
-            text = "Nothing found :(",
+            text = stringResource(R.string.nothing_found),
             fontWeight = FontWeight.Medium,
             fontSize = 20.sp
         )
